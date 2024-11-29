@@ -7,4 +7,6 @@ COPY ./src ./src
 
 RUN go mod download
 
-CMD ["go", "run", "src/main.go"]
+RUN go build src/main.go
+
+CMD ["./main"]

@@ -1,1 +1,6 @@
+# Built binary
 main
+
+# InfluxDB container persistent volumes
+influxdb/config
+influxdb/data
