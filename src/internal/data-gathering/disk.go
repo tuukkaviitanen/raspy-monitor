@@ -13,8 +13,6 @@ func GetDiscData() (*models.DiscData, error) {
 		return nil, fmt.Errorf("Error getting disk usage: %v\n", err)
 	}
 
-	fmt.Printf("Disk Usage: Total: %v, Free: %v, Used: %v, UsedPercent: %.2f%%\n", diskUsage.Total, diskUsage.Free, diskUsage.Used, diskUsage.UsedPercent)
-
 	parsedDiscData := &models.DiscData{
 		Total:       diskUsage.Total,
 		Free:        diskUsage.Free,

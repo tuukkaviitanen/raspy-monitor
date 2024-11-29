@@ -11,8 +11,7 @@ import (
 func GetHostData() (*models.HostInfo, error) {
 	hostInfo, err := host.Info()
 	if err != nil {
-		fmt.Printf("Error getting host info: %v\n", err)
-		return nil, err
+		return nil, fmt.Errorf("Error getting host info: %v\n", err)
 	}
 
 	parsedHostInfo := &models.HostInfo{

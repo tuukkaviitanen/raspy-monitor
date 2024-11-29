@@ -2,6 +2,7 @@ package influx
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"raspy-monitor/src/internal/models"
 	"time"
@@ -24,7 +25,7 @@ func WriteSystemDataToInflux(cpuData *models.CPUData, memoryData *models.MemoryD
 	// Start a goroutine to handle errors
 	go func() {
 		for err := range writeAPI.Errors() {
-			fmt.Printf("Write error: %v\n", err)
+			log.Printf("InfluxDB write error: %v\n", err)
 		}
 	}()
 
@@ -56,11 +57,11 @@ func WriteSystemDataToInflux(cpuData *models.CPUData, memoryData *models.MemoryD
 		writeAPI.WritePoint(point)
 	}
 
-	if temperatureData != nil && len(temperatureData.SensorTemperatures) > 0 {
+	if temperatureData != nil && len(temperatureData.Temperatures) > 0 {
 		point := influxdb2.NewPointWithMeasurement("temperature_data").
 			SetTime(timestamp)
 
-		for sensor, temperature := range temperatureData.SensorTemperatures {
+		for sensor, temperature := range temperatureData.Temperatures {
 			point.AddField(sensor, temperature)
 		}
 

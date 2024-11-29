@@ -15,14 +15,6 @@ func GetTemperatureData() (*models.TemperatureData, error) {
 		return nil, fmt.Errorf("Error getting temperatures: %v\n", err)
 	}
 
-	for _, temp := range temperatures {
-		fmt.Printf("Sensor: %s, Temperature: %.2f°C\n", temp.SensorKey, temp.Temperature)
-	}
-
-	if len(temperatures) == 0 {
-		fmt.Println("No temperature sensors found")
-	}
-
 	sensorMap := make(map[string]float64)
 
 	for _, temp := range temperatures {
@@ -30,7 +22,7 @@ func GetTemperatureData() (*models.TemperatureData, error) {
 	}
 
 	parsedTemperatureData := &models.TemperatureData{
-		SensorTemperatures: sensorMap,
+		Temperatures: sensorMap,
 	}
 
 	return parsedTemperatureData, nil

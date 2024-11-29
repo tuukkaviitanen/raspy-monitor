@@ -14,9 +14,6 @@ func GetMemoryData() (*models.MemoryData, error) {
 		return nil, fmt.Errorf("Error getting memory info: %v\n", err)
 	}
 
-	// almost every return value is a struct
-	fmt.Printf("Total: %v, Free:%v, Cached: %v, Buffers: %v, Available: %v, Used: %v, UsedPercent:%f%%\n", v.Total, v.Free, v.Cached, v.Buffers, v.Available, v.Used, v.UsedPercent)
-
 	parsedMemoryData := &models.MemoryData{
 		Total:       v.Total,
 		Free:        v.Free,

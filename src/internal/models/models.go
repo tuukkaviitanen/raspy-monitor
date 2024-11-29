@@ -30,7 +30,7 @@ type MemoryData struct {
 }
 
 type TemperatureData struct {
-	SensorTemperatures map[string]float64
+	Temperatures map[string]float64
 }
 
 type DiscData struct {
