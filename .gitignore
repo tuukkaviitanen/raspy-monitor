@@ -4,3 +4,5 @@ main
 # InfluxDB container persistent volumes
 influxdb/config
 influxdb/data
+
+grafana/data
