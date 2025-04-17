@@ -4,6 +4,7 @@ import (
 	"log"
 	datagathering "raspy-monitor/src/internal/data-gathering"
 	"raspy-monitor/src/internal/influx"
+	"raspy-monitor/src/internal/models"
 	"time"
 )
 
@@ -35,31 +36,41 @@ func main() {
 func monitoringRun() {
 	log.Println("Starting data collection...")
 
+	measurements := make(models.InfluxDbMeasurements)
+
 	cpuData, err := datagathering.GetCpuData()
 	if err != nil {
 		log.Printf("Error getting CPU info: %v\n", err)
+	} else {
+		measurements["cpu_data"] = cpuData
 	}
 
 	memoryData, err := datagathering.GetMemoryData()
 	if err != nil {
 		log.Printf("Error getting memory info: %v\n", err)
+	} else {
+		measurements["memory_data"] = memoryData
 	}
 
 	temperatureData, err := datagathering.GetTemperatureData()
 	if err != nil {
 		log.Printf("Error getting temperature info: %v\n", err)
+	} else {
+		measurements["temperature_data"] = temperatureData
 	}
 
 	discData, err := datagathering.GetDiscData()
 	if err != nil {
 		log.Printf("Error getting disc info: %v\n", err)
+	} else {
+		measurements["disc_data"] = discData
 	}
 
 	log.Println("Finished data collection")
 
 	log.Println("Writing data to InfluxDB...")
 
-	influx.WriteSystemDataToInflux(cpuData, memoryData, temperatureData, discData)
+	influx.WriteSystemDataToInflux(measurements)
 
 	log.Println("Writing data to influxDB done")
 }
