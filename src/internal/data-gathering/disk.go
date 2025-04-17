@@ -7,18 +7,18 @@ import (
 	"github.com/shirou/gopsutil/v4/disk"
 )
 
-func GetDiscData() (*models.DiscData, error) {
+func GetDiscData() (models.InfluxDbFields, error) {
+	fields := make(models.InfluxDbFields)
+
 	diskUsage, err := disk.Usage("/")
 	if err != nil {
 		return nil, fmt.Errorf("Error getting disk usage: %v\n", err)
 	}
 
-	parsedDiscData := &models.DiscData{
-		Total:       diskUsage.Total,
-		Free:        diskUsage.Free,
-		Used:        diskUsage.Used,
-		UsedPercent: diskUsage.UsedPercent,
-	}
+	fields["total"] = diskUsage.Total
+	fields["free"] = diskUsage.Free
+	fields["used"] = diskUsage.Used
+	fields["used_percent"] = diskUsage.UsedPercent
 
-	return parsedDiscData, nil
+	return fields, nil
 }

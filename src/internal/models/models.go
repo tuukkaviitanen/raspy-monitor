@@ -39,3 +39,9 @@ type DiscData struct {
 	Used        uint64
 	UsedPercent float64
 }
+
+type InfluxDbValue interface{}
+
+type InfluxDbFields map[string]InfluxDbValue
+
+type InfluxDbMeasurements map[string]InfluxDbFields
