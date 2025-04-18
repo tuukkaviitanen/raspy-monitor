@@ -26,6 +26,12 @@ func main() {
 		log.Printf("Boot time: %s\n", hostInfo.BootTime.Format(time.RFC1123))
 	} // No need to keep hostInfo in memory so closing the scope
 
+	go datagathering.StreamDockerData(func(measurements models.InfluxDbMeasurements) {
+		log.Println("Docker data received")
+		influx.WriteSystemDataToInflux(measurements)
+		log.Println("Docker data written to InfluxDB")
+	})
+
 	// Run monitoring every second
 	ticker := time.NewTicker(time.Second)
 	for range ticker.C {

@@ -21,3 +21,14 @@ type InfluxDbTaggedValue struct {
 type InfluxDbFields map[string][]InfluxDbTaggedValue
 
 type InfluxDbMeasurements map[string]InfluxDbFields
+
+type DockerStat struct {
+	Name             string `json:"Name"`
+	ContainerId      string `json:"Container"`
+	BlockIO          string `json:"BlockIO"`
+	CPUPercentage    string `json:"CPUPerc"`
+	MemoryPercentage string `json:"MemPerc"`
+	MemoryUsage      string `json:"MemUsage"`
+	NetIO            string `json:"NetIO"`
+	PIDs             string `json:"PIDs"`
+}
