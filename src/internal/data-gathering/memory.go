@@ -16,13 +16,13 @@ func GetMemoryData() (models.InfluxDbFields, error) {
 		return nil, fmt.Errorf("Error getting memory info: %v\n", err)
 	}
 
-	fields["total"] = v.Total
-	fields["free"] = v.Free
-	fields["cached"] = v.Cached
-	fields["buffers"] = v.Buffers
-	fields["available"] = v.Available
-	fields["used"] = v.Used
-	fields["used_percent"] = v.UsedPercent
+	fields["total"] = []models.InfluxDbTaggedValue{{Value: v.Total}}
+	fields["free"] = []models.InfluxDbTaggedValue{{Value: v.Free}}
+	fields["cached"] = []models.InfluxDbTaggedValue{{Value: v.Cached}}
+	fields["buffers"] = []models.InfluxDbTaggedValue{{Value: v.Buffers}}
+	fields["available"] = []models.InfluxDbTaggedValue{{Value: v.Available}}
+	fields["used"] = []models.InfluxDbTaggedValue{{Value: v.Used}}
+	fields["used_percent"] = []models.InfluxDbTaggedValue{{Value: v.UsedPercent}}
 
 	return fields, nil
 }

@@ -36,12 +36,20 @@ func WriteSystemDataToInflux(measurements models.InfluxDbMeasurements) {
 			continue
 		}
 
-		point := influxdb2.NewPointWithMeasurement(measurement).SetTime(timestamp)
+		for field, taggedValues := range fields {
 
-		for field, value := range fields {
-			point.AddField(field, value)
+			for _, taggedValue := range taggedValues {
+				point := influxdb2.NewPointWithMeasurement(measurement).SetTime(timestamp)
+
+				for tagKey, tagValue := range taggedValue.Tags {
+					point.AddTag(tagKey, tagValue)
+				}
+
+				point.AddField(field, taggedValue.Value)
+				writeAPI.WritePoint(point)
+			}
+
 		}
-		writeAPI.WritePoint(point)
 	}
 
 	writeAPI.Flush()

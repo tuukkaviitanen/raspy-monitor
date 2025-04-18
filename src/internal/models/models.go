@@ -13,8 +13,11 @@ type HostInfo struct {
 	BootTime        time.Time
 }
 
-type InfluxDbValue any
+type InfluxDbTaggedValue struct {
+	Value any
+	Tags  map[string]string
+}
 
-type InfluxDbFields map[string]InfluxDbValue
+type InfluxDbFields map[string][]InfluxDbTaggedValue
 
 type InfluxDbMeasurements map[string]InfluxDbFields
