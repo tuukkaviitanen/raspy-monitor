@@ -36,7 +36,7 @@ func main() {
 func monitoringRun() {
 	log.Println("Starting data collection...")
 
-	measurements := make(models.InfluxDbMeasurements)
+	measurements := models.InfluxDbMeasurements{}
 
 	cpuData, err := datagathering.GetCpuData()
 	if err != nil {

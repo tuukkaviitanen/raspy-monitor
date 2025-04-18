@@ -9,7 +9,7 @@ import (
 
 func GetTemperatureData() (models.InfluxDbFields, error) {
 
-	fields := make(models.InfluxDbFields)
+	fields := models.InfluxDbFields{}
 
 	// Get and print temperatures
 	temperatures, err := sensors.SensorsTemperatures()

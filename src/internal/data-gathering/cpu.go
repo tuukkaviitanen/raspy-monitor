@@ -10,7 +10,7 @@ import (
 
 func GetCpuData() (models.InfluxDbFields, error) {
 
-	fields := make(models.InfluxDbFields)
+	fields := models.InfluxDbFields{}
 
 	logicalCount, err := cpu.Counts(true)
 	if err != nil {

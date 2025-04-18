@@ -8,7 +8,7 @@ import (
 )
 
 func GetDiscData() (models.InfluxDbFields, error) {
-	fields := make(models.InfluxDbFields)
+	fields := models.InfluxDbFields{}
 
 	diskUsage, err := disk.Usage("/")
 	if err != nil {

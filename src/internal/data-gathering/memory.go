@@ -9,7 +9,7 @@ import (
 
 func GetMemoryData() (models.InfluxDbFields, error) {
 
-	fields := make(models.InfluxDbFields)
+	fields := models.InfluxDbFields{}
 
 	v, err := mem.VirtualMemory()
 	if err != nil {
