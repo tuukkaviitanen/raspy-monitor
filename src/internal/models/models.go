@@ -13,35 +13,22 @@ type HostInfo struct {
 	BootTime        time.Time
 }
 
-type CPUData struct {
-	LogicalCPUCount int
-	TotalCPUUsage   float64
-	CPUUsage        []float64
+type InfluxDbTaggedValue struct {
+	Value any
+	Tags  map[string]string
 }
 
-type MemoryData struct {
-	Total       uint64
-	Free        uint64
-	Cached      uint64
-	Buffers     uint64
-	Available   uint64
-	Used        uint64
-	UsedPercent float64
-}
-
-type TemperatureData struct {
-	Temperatures map[string]float64
-}
-
-type DiscData struct {
-	Total       uint64
-	Free        uint64
-	Used        uint64
-	UsedPercent float64
-}
-
-type InfluxDbValue interface{}
-
-type InfluxDbFields map[string]InfluxDbValue
+type InfluxDbFields map[string][]InfluxDbTaggedValue
 
 type InfluxDbMeasurements map[string]InfluxDbFields
+
+type DockerStat struct {
+	Name             string `json:"Name"`
+	ContainerId      string `json:"Container"`
+	BlockIO          string `json:"BlockIO"`
+	CPUPercentage    string `json:"CPUPerc"`
+	MemoryPercentage string `json:"MemPerc"`
+	MemoryUsage      string `json:"MemUsage"`
+	NetIO            string `json:"NetIO"`
+	PIDs             string `json:"PIDs"`
+}

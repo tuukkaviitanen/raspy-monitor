@@ -9,7 +9,7 @@ import (
 
 func GetTemperatureData() (models.InfluxDbFields, error) {
 
-	fields := make(models.InfluxDbFields)
+	fields := models.InfluxDbFields{}
 
 	// Get and print temperatures
 	temperatures, err := sensors.SensorsTemperatures()
@@ -17,9 +17,13 @@ func GetTemperatureData() (models.InfluxDbFields, error) {
 		return nil, fmt.Errorf("Error getting temperatures: %v\n", err)
 	}
 
+	temperatureField := []models.InfluxDbTaggedValue{}
+
 	for _, temp := range temperatures {
-		fields[temp.SensorKey] = temp.Temperature
+		temperatureField = append(temperatureField, models.InfluxDbTaggedValue{Value: temp.Temperature, Tags: map[string]string{"sensor": temp.SensorKey}})
 	}
+
+	fields["temperature"] = temperatureField
 
 	return fields, nil
 }

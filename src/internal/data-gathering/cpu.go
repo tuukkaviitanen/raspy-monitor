@@ -10,7 +10,7 @@ import (
 
 func GetCpuData() (models.InfluxDbFields, error) {
 
-	fields := make(models.InfluxDbFields)
+	fields := models.InfluxDbFields{}
 
 	logicalCount, err := cpu.Counts(true)
 	if err != nil {
@@ -34,13 +34,17 @@ func GetCpuData() (models.InfluxDbFields, error) {
 
 	totalCPUUsage /= float64(len(cpuPercentages))
 
-	fields["total_cpu_usage"] = totalCPUUsage
-	fields["logical_cpu_count"] = logicalCount
+	fields["total_cpu_usage"] = []models.InfluxDbTaggedValue{{Value: totalCPUUsage}}
+	fields["logical_cpu_count"] = []models.InfluxDbTaggedValue{{Value: logicalCount}}
+
+	cpuCoreField := []models.InfluxDbTaggedValue{}
 
 	for index, usage := range cpuPercentages {
-		field := fmt.Sprintf("cpu_%d_usage", index)
-		fields[field] = usage
+		cpuCoreField = append(cpuCoreField, models.InfluxDbTaggedValue{
+			Value: usage, Tags: map[string]string{"cpu_core": fmt.Sprintf("%d", index)}})
 	}
+
+	fields["cpu_core_usage"] = cpuCoreField
 
 	return fields, nil
 }
