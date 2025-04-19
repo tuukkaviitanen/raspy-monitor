@@ -26,12 +26,6 @@ func main() {
 		log.Printf("Boot time: %s\n", hostInfo.BootTime.Format(time.RFC1123))
 	} // No need to keep hostInfo in memory so closing the scope
 
-	go datagathering.StreamDockerData(func(measurements models.InfluxDbMeasurements) {
-		log.Println("Docker data received")
-		influx.WriteSystemDataToInflux(measurements)
-		log.Println("Docker data written to InfluxDB")
-	})
-
 	// Run monitoring every second
 	ticker := time.NewTicker(time.Second)
 	for range ticker.C {
@@ -44,39 +38,39 @@ func monitoringRun() {
 
 	measurements := models.InfluxDbMeasurements{}
 
-	cpuData, err := datagathering.GetCpuData()
-	if err != nil {
-		log.Printf("Error getting CPU info: %v\n", err)
+	if cpuData, err := datagathering.GetCpuData(); err != nil {
+		log.Printf("Error getting CPU data: %v\n", err)
 	} else {
 		measurements["cpu_data"] = cpuData
 	}
 
-	memoryData, err := datagathering.GetMemoryData()
-	if err != nil {
-		log.Printf("Error getting memory info: %v\n", err)
+	if memoryData, err := datagathering.GetMemoryData(); err != nil {
+		log.Printf("Error getting memory data: %v\n", err)
 	} else {
 		measurements["memory_data"] = memoryData
 	}
 
-	temperatureData, err := datagathering.GetTemperatureData()
-	if err != nil {
-		log.Printf("Error getting temperature info: %v\n", err)
+	if temperatureData, err := datagathering.GetTemperatureData(); err != nil {
+		log.Printf("Error getting temperature data: %v\n", err)
 	} else {
 		measurements["temperature_data"] = temperatureData
 	}
 
-	discData, err := datagathering.GetDiscData()
-	if err != nil {
-		log.Printf("Error getting disc info: %v\n", err)
+	if discData, err := datagathering.GetDiscData(); err != nil {
+		log.Printf("Error getting disc data: %v\n", err)
 	} else {
 		measurements["disc_data"] = discData
 	}
 
-	log.Println("Finished data collection")
+	if dockerData, err := datagathering.GetDockerData(); err != nil {
+		log.Printf("Error getting docker data: %v\n", err)
+	} else {
+		measurements["docker_data"] = dockerData
+	}
 
-	log.Println("Writing data to InfluxDB...")
+	log.Println("Finished data collection, writing data to InfluxDB...")
 
 	influx.WriteSystemDataToInflux(measurements)
 
-	log.Println("Writing data to influxDB done")
+	log.Println("Data written to InfluxDB successfully")
 }
