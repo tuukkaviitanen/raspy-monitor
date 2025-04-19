@@ -17,7 +17,7 @@ func GetDockerData() (models.InfluxDbFields, error) {
 	// Run command and wait for output
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf("Error creating Docker StdoutPipe:", err)
+		return nil, fmt.Errorf("Error executing docker stats: %w", err)
 	}
 
 	outputStr := string(output)
