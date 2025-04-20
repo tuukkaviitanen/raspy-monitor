@@ -7,23 +7,20 @@ import (
 	"github.com/shirou/gopsutil/v4/sensors"
 )
 
-func GetTemperatureData() (models.InfluxDbFields, error) {
-
-	fields := models.InfluxDbFields{}
+func GetTemperatureData() ([]models.InfluxDbField, error) {
 
 	// Get and print temperatures
-	temperatures, err := sensors.SensorsTemperatures()
-	if err != nil {
+	if temperatures, err := sensors.SensorsTemperatures(); err != nil {
 		return nil, fmt.Errorf("Error getting temperatures: %v\n", err)
+	} else {
+
+		fields := []models.InfluxDbField{}
+
+		for _, temp := range temperatures {
+			fields = append(fields, models.InfluxDbField{Value: temp.Temperature,
+				Tags: []models.InfluxDbTag{{Name: "sensor", Value: temp.SensorKey}}})
+		}
+
+		return fields, nil
 	}
-
-	temperatureField := []models.InfluxDbTaggedValue{}
-
-	for _, temp := range temperatures {
-		temperatureField = append(temperatureField, models.InfluxDbTaggedValue{Value: temp.Temperature, Tags: map[string]string{"sensor": temp.SensorKey}})
-	}
-
-	fields["temperature"] = temperatureField
-
-	return fields, nil
 }

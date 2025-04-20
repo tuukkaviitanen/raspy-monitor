@@ -36,36 +36,36 @@ func main() {
 func monitoringRun() {
 	log.Println("Starting data collection...")
 
-	measurements := models.InfluxDbMeasurements{}
+	measurements := []models.InfluxDbMeasurement{}
 
 	if cpuData, err := datagathering.GetCpuData(); err != nil {
 		log.Printf("Error getting CPU data: %v\n", err)
 	} else {
-		measurements["cpu_data"] = cpuData
+		measurements = append(measurements, models.InfluxDbMeasurement{Name: "cpu_data", Fields: cpuData})
 	}
 
 	if memoryData, err := datagathering.GetMemoryData(); err != nil {
 		log.Printf("Error getting memory data: %v\n", err)
 	} else {
-		measurements["memory_data"] = memoryData
+		measurements = append(measurements, models.InfluxDbMeasurement{Name: "memory_data", Fields: memoryData})
 	}
 
 	if temperatureData, err := datagathering.GetTemperatureData(); err != nil {
 		log.Printf("Error getting temperature data: %v\n", err)
 	} else {
-		measurements["temperature_data"] = temperatureData
+		measurements = append(measurements, models.InfluxDbMeasurement{Name: "temperature_data", Fields: temperatureData})
 	}
 
 	if discData, err := datagathering.GetDiscData(); err != nil {
 		log.Printf("Error getting disc data: %v\n", err)
 	} else {
-		measurements["disc_data"] = discData
+		measurements = append(measurements, models.InfluxDbMeasurement{Name: "disc_data", Fields: discData})
 	}
 
 	if dockerData, err := datagathering.GetDockerData(); err != nil {
 		log.Printf("Error getting docker data: %v\n", err)
 	} else {
-		measurements["docker_data"] = dockerData
+		measurements = append(measurements, models.InfluxDbMeasurement{Name: "docker_data", Fields: dockerData})
 	}
 
 	log.Println("Finished data collection, writing data to InfluxDB...")

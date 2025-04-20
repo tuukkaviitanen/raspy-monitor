@@ -7,22 +7,19 @@ import (
 	"github.com/shirou/gopsutil/v4/mem"
 )
 
-func GetMemoryData() (models.InfluxDbFields, error) {
-
-	fields := models.InfluxDbFields{}
-
-	v, err := mem.VirtualMemory()
-	if err != nil {
+func GetMemoryData() ([]models.InfluxDbField, error) {
+	if v, err := mem.VirtualMemory(); err != nil {
 		return nil, fmt.Errorf("Error getting memory info: %v\n", err)
+	} else {
+		fields := []models.InfluxDbField{
+			{Name: "total", Value: v.Total},
+			{Name: "free", Value: v.Free},
+			{Name: "cached", Value: v.Cached},
+			{Name: "buffers", Value: v.Buffers},
+			{Name: "available", Value: v.Available},
+			{Name: "used", Value: v.Used},
+			{Name: "used_percent", Value: v.UsedPercent},
+		}
+		return fields, nil
 	}
-
-	fields["total"] = []models.InfluxDbTaggedValue{{Value: v.Total}}
-	fields["free"] = []models.InfluxDbTaggedValue{{Value: v.Free}}
-	fields["cached"] = []models.InfluxDbTaggedValue{{Value: v.Cached}}
-	fields["buffers"] = []models.InfluxDbTaggedValue{{Value: v.Buffers}}
-	fields["available"] = []models.InfluxDbTaggedValue{{Value: v.Available}}
-	fields["used"] = []models.InfluxDbTaggedValue{{Value: v.Used}}
-	fields["used_percent"] = []models.InfluxDbTaggedValue{{Value: v.UsedPercent}}
-
-	return fields, nil
 }

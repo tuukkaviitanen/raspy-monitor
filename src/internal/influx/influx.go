@@ -16,9 +16,8 @@ var (
 	INFLUXDB_BUCKET = os.Getenv("INFLUXDB_BUCKET")
 )
 
-func WriteSystemDataToInflux(measurements models.InfluxDbMeasurements) {
+func WriteSystemDataToInflux(measurements []models.InfluxDbMeasurement) {
 	client := influxdb2.NewClient(INFLUXDB_URL, INFLUXDB_TOKEN)
-
 	writeAPI := client.WriteAPI(INFLUXDB_ORG, INFLUXDB_BUCKET)
 
 	// Start a goroutine to handle errors
@@ -30,25 +29,19 @@ func WriteSystemDataToInflux(measurements models.InfluxDbMeasurements) {
 
 	timestamp := time.Now()
 
-	for measurement, fields := range measurements {
-		if len(fields) == 0 {
-			log.Printf("No fields to write for measurement %s\n", measurement)
+	for _, measurement := range measurements {
+		if len(measurement.Fields) == 0 {
+			log.Printf("No fields to write for measurement %s\n", measurement.Name)
 			continue
 		}
 
-		for field, taggedValues := range fields {
-
-			for _, taggedValue := range taggedValues {
-				point := influxdb2.NewPointWithMeasurement(measurement).SetTime(timestamp)
-
-				for tagKey, tagValue := range taggedValue.Tags {
-					point.AddTag(tagKey, tagValue)
-				}
-
-				point.AddField(field, taggedValue.Value)
-				writeAPI.WritePoint(point)
+		for _, field := range measurement.Fields {
+			point := influxdb2.NewPointWithMeasurement(measurement.Name).SetTime(timestamp)
+			for _, tag := range field.Tags {
+				point.AddTag(tag.Name, tag.Value)
 			}
-
+			point.AddField(field.Name, field.Value)
+			writeAPI.WritePoint(point)
 		}
 	}
 
