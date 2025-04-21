@@ -13,14 +13,21 @@ type HostInfo struct {
 	BootTime        time.Time
 }
 
-type InfluxDbTaggedValue struct {
-	Value any
-	Tags  map[string]string
+type InfluxDbTag struct {
+	Name  string
+	Value string
 }
 
-type InfluxDbFields map[string][]InfluxDbTaggedValue
+type InfluxDbField struct {
+	Name  string
+	Value any
+	Tags  []InfluxDbTag
+}
 
-type InfluxDbMeasurements map[string]InfluxDbFields
+type InfluxDbMeasurement struct {
+	Name   string
+	Fields []InfluxDbField
+}
 
 type DockerStat struct {
 	Name             string `json:"Name"`

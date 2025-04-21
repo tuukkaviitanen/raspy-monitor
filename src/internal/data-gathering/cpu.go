@@ -8,9 +8,7 @@ import (
 	"github.com/shirou/gopsutil/v4/cpu"
 )
 
-func GetCpuData() (models.InfluxDbFields, error) {
-
-	fields := models.InfluxDbFields{}
+func GetCpuData() ([]models.InfluxDbField, error) {
 
 	logicalCount, err := cpu.Counts(true)
 	if err != nil {
@@ -34,17 +32,16 @@ func GetCpuData() (models.InfluxDbFields, error) {
 
 	totalCPUUsage /= float64(len(cpuPercentages))
 
-	fields["total_cpu_usage"] = []models.InfluxDbTaggedValue{{Value: totalCPUUsage}}
-	fields["logical_cpu_count"] = []models.InfluxDbTaggedValue{{Value: logicalCount}}
-
-	cpuCoreField := []models.InfluxDbTaggedValue{}
-
-	for index, usage := range cpuPercentages {
-		cpuCoreField = append(cpuCoreField, models.InfluxDbTaggedValue{
-			Value: usage, Tags: map[string]string{"cpu_core": fmt.Sprintf("%d", index)}})
+	fields := []models.InfluxDbField{
+		{Name: "total_cpu_usage", Value: totalCPUUsage},
+		{Name: "logical_cpu_count", Value: logicalCount},
 	}
 
-	fields["cpu_core_usage"] = cpuCoreField
+	for index, usage := range cpuPercentages {
+		fields = append(fields, models.InfluxDbField{
+			Name:  "cpu_core_usage",
+			Value: usage, Tags: []models.InfluxDbTag{{Name: "cpu_core", Value: fmt.Sprintf("%d", index)}}})
+	}
 
 	return fields, nil
 }

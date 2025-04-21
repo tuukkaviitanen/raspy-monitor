@@ -9,6 +9,7 @@ require (
 
 require (
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
+	github.com/docker/go-units v0.5.0 // indirect
 	github.com/ebitengine/purego v0.8.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/uuid v1.3.1 // indirect
