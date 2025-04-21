@@ -6,8 +6,11 @@ import (
 	"log"
 	"os/exec"
 	"raspy-monitor/src/internal/models"
+	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/docker/go-units"
 )
 
 func GetDockerData() ([]models.InfluxDbField, error) {
@@ -53,46 +56,122 @@ func handleStats(jsonStats string) []models.InfluxDbField {
 			continue
 		}
 
-		if parsedCPUPercentage, err := parsePercentage(DockerStat.CPUPercentage); err != nil {
+		if cpuPercentage, err := parsePercentage(DockerStat.CPUPercentage); err != nil {
 			log.Printf("Error parsing CPU percentage: %s\n", err)
 			continue
 		} else {
 			fields = append(fields, models.InfluxDbField{
 				Name:  "cpu_usage_percentage",
-				Value: parsedCPUPercentage,
+				Value: cpuPercentage,
 				Tags: []models.InfluxDbTag{{
 					Name: "container_name", Value: DockerStat.Name,
 				}},
 			})
 		}
 
-		if parsedMemPercentage, err := parsePercentage(DockerStat.MemoryPercentage); err != nil {
+		if memoryUsedPercentage, err := parsePercentage(DockerStat.MemoryPercentage); err != nil {
 			log.Printf("Error parsing Memory percentage: %s\n", err)
 			continue
 		} else {
 			fields = append(fields, models.InfluxDbField{
 				Name:  "memory_usage_percentage",
-				Value: parsedMemPercentage,
+				Value: memoryUsedPercentage,
 				Tags: []models.InfluxDbTag{{
 					Name: "container_name", Value: DockerStat.Name,
 				}},
 			})
 		}
 
-		if parsedPidCount, err := strconv.Atoi(DockerStat.PIDs); err != nil {
+		if pidCount, err := strconv.Atoi(DockerStat.PIDs); err != nil {
 			log.Printf("Error parsing Memory percentage: %s\n", err)
 			continue
 		} else {
 			fields = append(fields, models.InfluxDbField{
 				Name:  "pid_count",
-				Value: parsedPidCount,
+				Value: pidCount,
 				Tags: []models.InfluxDbTag{{
 					Name: "container_name", Value: DockerStat.Name,
 				}},
 			})
 		}
+		{
+			memoryUsageMatches := doubleStatRegex.FindStringSubmatch(DockerStat.MemoryUsage)
 
+			if memoryUsage, err := units.FromHumanSize(memoryUsageMatches[1]); err != nil {
+				log.Printf("Error parsing Memory usage: %s\n", err)
+				continue
+			} else {
+				fields = append(fields, models.InfluxDbField{
+					Name:  "memory_usage",
+					Value: memoryUsage,
+					Tags: []models.InfluxDbTag{{
+						Name: "container_name", Value: DockerStat.Name,
+					}},
+				})
+			}
+		}
+		{
+			netIOMatches := doubleStatRegex.FindStringSubmatch(DockerStat.NetIO)
+
+			if dataReceived, err := units.FromHumanSize(netIOMatches[1]); err != nil {
+				log.Printf("Error parsing data received: %s\n", err)
+				continue
+			} else {
+				fields = append(fields, models.InfluxDbField{
+					Name:  "data_received",
+					Value: dataReceived,
+					Tags: []models.InfluxDbTag{{
+						Name: "container_name", Value: DockerStat.Name,
+					}},
+				})
+			}
+
+			if dataSent, err := units.FromHumanSize(netIOMatches[2]); err != nil {
+				log.Printf("Error parsing data sent: %s\n", err)
+				continue
+			} else {
+				fields = append(fields, models.InfluxDbField{
+					Name:  "data_sent",
+					Value: dataSent,
+					Tags: []models.InfluxDbTag{{
+						Name: "container_name", Value: DockerStat.Name,
+					}},
+				})
+			}
+		}
+
+		{
+			blockIOMatches := doubleStatRegex.FindStringSubmatch(DockerStat.BlockIO)
+
+			if dataRead, err := units.FromHumanSize(blockIOMatches[1]); err != nil {
+				log.Printf("Error parsing data read: %s\n", err)
+				continue
+			} else {
+				fields = append(fields, models.InfluxDbField{
+					Name:  "data_read",
+					Value: dataRead,
+					Tags: []models.InfluxDbTag{{
+						Name: "container_name", Value: DockerStat.Name,
+					}},
+				})
+			}
+
+			if dataWritten, err := units.FromHumanSize(blockIOMatches[2]); err != nil {
+				log.Printf("Error parsing data written: %s\n", err)
+				continue
+			} else {
+				fields = append(fields, models.InfluxDbField{
+					Name:  "data_written",
+					Value: dataWritten,
+					Tags: []models.InfluxDbTag{{
+						Name: "container_name", Value: DockerStat.Name,
+					}},
+				})
+			}
+		}
 	}
 
 	return fields
 }
+
+var doubleStatRegex = regexp.MustCompile(`^(.*) / (.*)$`)
