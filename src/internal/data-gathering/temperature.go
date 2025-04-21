@@ -17,8 +17,11 @@ func GetTemperatureData() ([]models.InfluxDbField, error) {
 		fields := []models.InfluxDbField{}
 
 		for _, temp := range temperatures {
-			fields = append(fields, models.InfluxDbField{Value: temp.Temperature,
-				Tags: []models.InfluxDbTag{{Name: "sensor", Value: temp.SensorKey}}})
+			fields = append(fields, models.InfluxDbField{
+				Name:  "temperature",
+				Value: temp.Temperature,
+				Tags:  []models.InfluxDbTag{{Name: "sensor", Value: temp.SensorKey}},
+			})
 		}
 
 		return fields, nil
