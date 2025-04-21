@@ -43,6 +43,18 @@ func parsePercentage(percentageStr string) (float64, error) {
 	return parsedFloat, nil
 }
 
+func addDockerField(fields []models.InfluxDbField, name string, value any, containerName string) []models.InfluxDbField {
+	return append(fields, models.InfluxDbField{
+		Name:  name,
+		Value: value,
+		Tags: []models.InfluxDbTag{{
+			Name: "container_name", Value: containerName,
+		}},
+	})
+}
+
+var doubleStatRegex = regexp.MustCompile(`^(.*) / (.*)$`)
+
 func handleStats(jsonStats string) []models.InfluxDbField {
 	jsonLine := strings.Split(strings.TrimSpace(jsonStats), "\n")
 
@@ -60,39 +72,21 @@ func handleStats(jsonStats string) []models.InfluxDbField {
 			log.Printf("Error parsing CPU percentage: %s\n", err)
 			continue
 		} else {
-			fields = append(fields, models.InfluxDbField{
-				Name:  "cpu_usage_percentage",
-				Value: cpuPercentage,
-				Tags: []models.InfluxDbTag{{
-					Name: "container_name", Value: DockerStat.Name,
-				}},
-			})
+			fields = addDockerField(fields, "cpu_usage_percentage", cpuPercentage, DockerStat.Name)
 		}
 
 		if memoryUsedPercentage, err := parsePercentage(DockerStat.MemoryPercentage); err != nil {
 			log.Printf("Error parsing Memory percentage: %s\n", err)
 			continue
 		} else {
-			fields = append(fields, models.InfluxDbField{
-				Name:  "memory_usage_percentage",
-				Value: memoryUsedPercentage,
-				Tags: []models.InfluxDbTag{{
-					Name: "container_name", Value: DockerStat.Name,
-				}},
-			})
+			fields = addDockerField(fields, "memory_usage_percentage", memoryUsedPercentage, DockerStat.Name)
 		}
 
 		if pidCount, err := strconv.Atoi(DockerStat.PIDs); err != nil {
 			log.Printf("Error parsing Memory percentage: %s\n", err)
 			continue
 		} else {
-			fields = append(fields, models.InfluxDbField{
-				Name:  "pid_count",
-				Value: pidCount,
-				Tags: []models.InfluxDbTag{{
-					Name: "container_name", Value: DockerStat.Name,
-				}},
-			})
+			fields = addDockerField(fields, "pid_count", pidCount, DockerStat.Name)
 		}
 		{
 			memoryUsageMatches := doubleStatRegex.FindStringSubmatch(DockerStat.MemoryUsage)
@@ -101,13 +95,7 @@ func handleStats(jsonStats string) []models.InfluxDbField {
 				log.Printf("Error parsing Memory usage: %s\n", err)
 				continue
 			} else {
-				fields = append(fields, models.InfluxDbField{
-					Name:  "memory_usage",
-					Value: memoryUsage,
-					Tags: []models.InfluxDbTag{{
-						Name: "container_name", Value: DockerStat.Name,
-					}},
-				})
+				fields = addDockerField(fields, "memory_usage", memoryUsage, DockerStat.Name)
 			}
 		}
 		{
@@ -117,26 +105,14 @@ func handleStats(jsonStats string) []models.InfluxDbField {
 				log.Printf("Error parsing data received: %s\n", err)
 				continue
 			} else {
-				fields = append(fields, models.InfluxDbField{
-					Name:  "data_received",
-					Value: dataReceived,
-					Tags: []models.InfluxDbTag{{
-						Name: "container_name", Value: DockerStat.Name,
-					}},
-				})
+				fields = addDockerField(fields, "data_received", dataReceived, DockerStat.Name)
 			}
 
 			if dataSent, err := units.FromHumanSize(netIOMatches[2]); err != nil {
 				log.Printf("Error parsing data sent: %s\n", err)
 				continue
 			} else {
-				fields = append(fields, models.InfluxDbField{
-					Name:  "data_sent",
-					Value: dataSent,
-					Tags: []models.InfluxDbTag{{
-						Name: "container_name", Value: DockerStat.Name,
-					}},
-				})
+				fields = addDockerField(fields, "data_sent", dataSent, DockerStat.Name)
 			}
 		}
 
@@ -147,31 +123,17 @@ func handleStats(jsonStats string) []models.InfluxDbField {
 				log.Printf("Error parsing data read: %s\n", err)
 				continue
 			} else {
-				fields = append(fields, models.InfluxDbField{
-					Name:  "data_read",
-					Value: dataRead,
-					Tags: []models.InfluxDbTag{{
-						Name: "container_name", Value: DockerStat.Name,
-					}},
-				})
+				fields = addDockerField(fields, "data_read", dataRead, DockerStat.Name)
 			}
 
 			if dataWritten, err := units.FromHumanSize(blockIOMatches[2]); err != nil {
 				log.Printf("Error parsing data written: %s\n", err)
 				continue
 			} else {
-				fields = append(fields, models.InfluxDbField{
-					Name:  "data_written",
-					Value: dataWritten,
-					Tags: []models.InfluxDbTag{{
-						Name: "container_name", Value: DockerStat.Name,
-					}},
-				})
+				fields = addDockerField(fields, "data_written", dataWritten, DockerStat.Name)
 			}
 		}
 	}
 
 	return fields
 }
-
-var doubleStatRegex = regexp.MustCompile(`^(.*) / (.*)$`)
