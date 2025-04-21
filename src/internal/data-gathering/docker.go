@@ -81,7 +81,7 @@ func handleStats(jsonStats string) []models.InfluxDbField {
 		}
 
 		if pidCount, err := strconv.Atoi(DockerStat.PIDs); err != nil {
-			log.Printf("Error parsing Memory percentage: %s\n", err)
+			log.Printf("Error parsing PID count: %s\n", err)
 		} else {
 			fields = addDockerField(fields, "pid_count", pidCount, DockerStat.Name)
 		}
